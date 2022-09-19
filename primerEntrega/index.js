@@ -2,8 +2,8 @@ class User {
     constructor(nombre,apellido,libros,mascotas){
     this.nombre=nombre;
     this.apellido=apellido;
-    this.libros=libros[{}];
-    this.mascotas=mascotas[""]
+    this.libros=libros;
+    this.mascotas=mascotas
 }
 
 getFullName(){
@@ -13,35 +13,36 @@ getFullName(){
 addMascota(nameMascotas){
         if (nameMascotas !== ""){
             this.mascotas.push(nameMascotas)
-            return(console.log(this.mascotas))
-        }
+            return(console.log(`agregar mascosta: ${nameMascotas}. Todas las mascotas: ${this.mascotas}` ))
     
-}
+}}
 
 countMascotas(){
-    (function(){
-        return(console.log(this.mascotas.length))
-    })
+        let n = this.mascotas.length
+        return(console.log(`cantidad de mascotas: ${n}`))
 }
 
 addBook(nameBook,autorBook){
     this.libros.push([{name:`${nameBook}`,autor:`${autorBook}`}])
-    return(console.log(this.libros))
+    return(console.log(`se agregan el libro:${nameBook}, autor: ${autorBook}.`))
 }
-getBookNames(){
+getBookNames(user){
     let n=[]
-    for (i in this.libros) {
-        n.push(i.name)
+
+    for (let i of user.libros) {
+        n.push(i[0].name)
     }
-    return(console.log(n))
+    return(console.log(`Nombre de libros del Usuario: ${n}.`))
 }
 
 }
 
-const user1= new User (`jose`,`perez`,``,`perro`);
+const user1= new User (`jose`,`perez`,[],["perro"]);
+
 user1.addMascota("gato")
 user1.countMascotas()
 user1.getFullName()
 user1.addBook('Fundacion','Isaac Asimov')
-user1.getBookNames()
 user1.addBook("El señor de las moscas","William Golding")
+user1.getBookNames(user1)
+
