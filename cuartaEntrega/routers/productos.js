@@ -10,28 +10,28 @@ const STATUS_CODE = {
   NO_CONTENT: 204,
   NOT_FOUND: 404,
 }
-const productos = [
+let productos = [
   {
     id: 1,
     title: 'pila',
-    price: 'Sanchez',
+    price: '400',
     thumbnail: '',
   },
   {
     id: 2,
-    title: 'pila',
-    price: 'Sanchez',
+    title: 'lampara',
+    price: '500',
     thumbnail: '',
   },
   {
     id: 3,
-    title: 'pila',
-    price: 'Sanchez',
+    title: 'martillo',
+    price: '300',
     thumbnail: '',
   },
 ]
 
-let siguienteID = 4
+let siguienteID = productos.length
 
 router.get('/productos', async(_, res) => {
   res.status(STATUS_CODE.OK).json(productos)
@@ -64,27 +64,37 @@ router.post('/productos', (req, res) => {
   res.status(STATUS_CODE.OK).json(data)
 })
 
+function actualizarProd(idProducto,data) {
+  const elementIndex = productos.findIndex((obj => obj.id == idProducto));
+  productos[elementIndex].title= data.title
+  productos[elementIndex].price= data.price
+  productos[elementIndex].thumbnail= data.thumbnail
+}
+
 router.put('/productos/:id',async (req, res) => {
   const idProducto = req.params.id
   const data = req.body
   try {
-    let productoBuscado = id(idProducto)
-    productoBuscado.title = data.title
-    productoBuscado.price = data.price
-    productoBuscado.thumbnail = data.thumbnail
-    productos.push(productoBuscado)
-    res.status(STATUS_CODE.NO_CONTENT).json(productoBuscado)
+    await actualizarProd(idProducto,data)
+    res.status(STATUS_CODE.NO_CONTENT).end()
+
   } catch (error) {
     console.log(error.message)
     res.json({error : 'producto no encontrado'}).end()
   }
 })
 
+function deleteProd(idProducto) {
+  const elementIndex = productos.findIndex((obj => obj.id == idProducto));
+  return productos.splice(elementIndex, 1)
+}
+
 router.delete('/productos/:id', async(req, res) => {
-  const idUsuario = req.params.id
+  const idProducto = req.params.id
   try {
-    productos.filter(product=>product.id !== idUsuario)
-    res.status(STATUS_CODE.NO_CONTENT).json(productos)
+    await deleteProd(idProducto)
+    res.status(STATUS_CODE.NO_CONTENT).end()
+
   } catch (error) {
     console.log(error.message)
     res.json({error : 'producto no encontrado'}).end()

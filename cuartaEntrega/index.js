@@ -3,21 +3,21 @@ const useragent = require('express-useragent')
 const path = require('path')
 
 const productos = require('./routers/productos')
-
+const upload = require('./routers/upload')
 
 const app = express()
 
 const PORT = process.env.NODE_PORT
-const ENV = process.env.NODE_ENV //
+const ENV = process.env.NODE_ENV 
 
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use('/static', express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(useragent.express())
 
-app.use('/api', productos)
+app.use('/api', productos, upload)
 
 
 app.use(function (err, req, res, next) {
