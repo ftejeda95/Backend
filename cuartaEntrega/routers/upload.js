@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
-router.post('/upload', upload.single('thumbnail'), (req, res, next) => {
+router.post('/productos', upload.single('thumbnail'), (req, res, next) => {
   const { file } = req
   if (!file) {
     const error = new Error('Archivo no encontrado.')

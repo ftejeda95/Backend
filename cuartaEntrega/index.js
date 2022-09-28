@@ -1,10 +1,10 @@
 const express = require('express')
 const useragent = require('express-useragent')
 const path = require('path')
-
 const productos = require('./routers/productos')
 const upload = require('./routers/upload')
-
+const indexRouter = require('./routers/views/index');
+const productsRouter = require('./routers/views/producto')
 const app = express()
 
 const PORT = process.env.NODE_PORT
@@ -15,8 +15,12 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
 app.use(useragent.express())
 
+app.use('/', indexRouter);
+app.use('/productos', productsRouter);
 app.use('/api', productos, upload)
 
 

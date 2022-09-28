@@ -101,4 +101,17 @@ router.delete('/productos/:id', async(req, res) => {
   }
 })
 
+router.get('/', function(req, res, next) {
+  res.render('index', { productos, isEmpty: !productos.length });
+});
+
+router.post('/productos', async function(req, res, next) {
+    await productos.push(req.body)
+    await console.log(productos[0].title)
+    await res.render('tabla', { productos, isEmpty: !productos.length })
+    
+}); 
+
+
+
 module.exports = router

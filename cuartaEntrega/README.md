@@ -16,10 +16,13 @@ Acá estamos configurando una variable de entorno para nuestro proyecto, en este
 npm start
 ```
 
-## Ejecutar en desarrollo
+## Ejecutar en desarrollo con NODEMON
 
 
 ```sh
-npm run dev
+npm run dev:wait
 ```
 Se encuentra archivo para ejecucion en POSTMAN.
+
+## Entrega EJS
+La ejecucion con el Motor de EJS es con PORT=8080 se ejecuta sobre el Home "/" y se cargan los productos en la ruta "/productos". Se elige el presente motor por ser a mi parecer el mas completo y mas usado pudiendo ejecutar con facilidad codigo JavaScript.
