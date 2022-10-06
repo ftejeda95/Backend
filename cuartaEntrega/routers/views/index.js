@@ -6,7 +6,7 @@ let siguienteID = 1
 /* GET home page. */
 
 router.get('/', function(req, res, next) {
-  res.render('index', { products});
+  res.render('index', { products });
 });
 
 router.post('/productos', async function(req, res, next) {
