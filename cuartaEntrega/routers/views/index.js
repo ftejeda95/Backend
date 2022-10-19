@@ -1,9 +1,9 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const knex = require('../../db/index')
 
-let products = []
-let siguienteID = 1
-/* GET home page. */
+let products = knex.getProducts()
+
 
 router.get('/', function(req, res, next) {
   res.render('index', { products });
@@ -13,15 +13,11 @@ router.post('/productos', async function(req, res, next) {
   let {body : data} = req
 
   if(data.title == ''|| data.price == ''||data.thumbnail == ''){
-    res.render('tabla',  { products, isEmpty: !products.length })
+     res.render('tabla',  { products, isEmpty: !products.length })
   }else{
-    data = { id: siguienteID, ...data }
-    products.push(data)
-    siguienteID++
-    await res.render('tabla', { products, isEmpty: !products.length,tieneImg: !products.thumbnail })
+    await knex.insertProducts(data)
+     res.render('tabla', { products, isEmpty: !products.length,tieneImg: !products.thumbnail })
   }
-  
-
 });
 
 

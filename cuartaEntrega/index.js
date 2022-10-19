@@ -8,7 +8,7 @@ const upload = require('./routers/upload')
 const indexRouter = require('./routers/views/index');
 const productsRouter = require('./routers/views/producto')
 const { initSocket } = require('./socket')
-
+const knex = require('./db/index')
 //Crear App
 const app = express()
 
@@ -35,6 +35,7 @@ app.use('/', indexRouter);
 app.use('/productos', productsRouter);
 app.use('/api', productos, upload)
 
+
 //configuro Error
 
 app.use(function (err, req, res, next) {
@@ -55,3 +56,4 @@ server.listen(PORT, () => {
   console.log(`Environment:${ENV}`)
 })
 server.on("error", error => console.log(`Error en servidor ${error}`))
+

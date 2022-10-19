@@ -11,8 +11,12 @@
 
   function showProducts(data) {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${data.id}</td> <td>${data.title}</td> <td>${data.price}</td>  <td><img src=${data.thumbnail} alt=${data.title} width="50px"></td>`;
-    tableProducts.appendChild(tr);
+    data.forEach(element => {
+      tr.innerHTML = `<td>${element.id}</td> <td>${element.title}</td> <td>${element.price}</td>  <td><img src=${element.thumbnail} alt=${element.title} width="50px"></td>`;
+      tableProducts.appendChild(tr);
+    });
+    
+
   };
 
   formProducts.addEventListener("submit", (e) => {
@@ -25,9 +29,8 @@
     socket.emit("new-products", data);
   });
 
-  socket.on("add", (data) => {
-    newProducts.push(data);
-    showProducts(data);
+  socket.on("add", (newProducts) => {
+    showProducts(newProducts);
   });
 
  
@@ -40,8 +43,10 @@
    let messages = [];
  
    function htmlList(mensajes) {
-    return mensajes.map(mensaje => {
-        return ( `<li style="color:green;"><strong style="color:blue;">${mensaje.email}</strong>--<span style="color:red;">${mensaje.date}</span>: ${mensaje.message}</li>`) 
+   mensajes.forEach(mensaje => {
+      const li = document.createElement("li");
+      li.innerHTML =  `<li style="color:green;"><strong style="color:blue;">${mensaje.email}</strong>--<span style="color:red;">${mensaje.date}</span>: ${mensaje.message}</li>`
+      listMessages.appendChild(li);
     });
 }
    formMessage.addEventListener("submit", (event) => {
@@ -56,10 +61,10 @@
    });
  
    socket.on("notification", (dataChat) => {
-     messages.push(dataChat);
-     console.log(messages)
-     const li = htmlList(messages)
-     listMessages.innerHTML = li;
+    const li = document.createElement("li");
+    li.innerHTML =  `<li style="color:green;"><strong style="color:blue;">${dataChat.email}</strong>--<span style="color:red;">${dataChat.date}</span>: ${dataChat.message}</li>`
+    listMessages.appendChild(li);
+
    });
 
 

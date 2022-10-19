@@ -1,5 +1,5 @@
 const { Server } = require('socket.io')
-
+const knex = require('./db/index')
 let io
 let newProducts = []
 let siguienteID = 1
@@ -12,17 +12,17 @@ function initSocket (httpServer){
 function setEvent (io){
     io.on('connection', async (socketClient) =>{
         console.log('se contecto un nuevo cliente al servidor', socketClient.id)
-        
-        socketClient.on('new-products', (data) =>{
-            data = { id: siguienteID, ...data }
-            newProducts.push(data)
-            siguienteID++
-            console.log(data)
-            io.sockets.emit('add', data)
+        socketClient.on('new-products',async (data) =>{
+            await knex.createTable()
+            await knex.insertProducts(data)
+            const newProducts = await knex.getProducts()
+            io.sockets.emit('add', newProducts)
         })  
         socketClient.on('new-message', async (dataChat) => {
+            await knex.createTableMessagge()
             dataChat.date = new Date().toDateString();
-            io.sockets.emit('notification', await dataChat)
+            const newMessagge = await knex.insertMessagge(dataChat)
+            io.sockets.emit('notification', newMessagge)
         })
         socketClient.on('disconnection', () =>{
             console.log('se desconecto del servidor el cliente', socketClient.id)

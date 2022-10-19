@@ -1,7 +1,7 @@
 
 const express = require('express')
 const { Router } = express
-
+const knex = require('../db/index')
 const router = Router(Router)
 
 const STATUS_CODE = {
@@ -34,21 +34,19 @@ let productos = [
 let siguienteID = productos.length
 
 router.get('/productos', async(_, res) => {
-  res.status(STATUS_CODE.OK).json(productos)
+  const productosDb= await knex.getProducts()
+  res.status(STATUS_CODE.OK).json(productosDb)
 })
 
- function id(idProducto) {
-  const productoID =  productos.find(prod=> prod.id == idProducto )
-  return(productoID)
- }
+//  function id(idProducto) {
+//   const productoID =  productos.find(prod=> prod.id == idProducto )
+//   return(productoID)
+//  }
 router.get('/productos/:id', async (req, res) => {
    const idProducto = req.params.id
   try {
-    if(idProducto > productos.length){
-      res.json( {error : 'producto no encontrado'} )
-    } else{
-      res.status(STATUS_CODE.OK).json(id(idProducto))
-    }
+    const productID=await knex.getProductsId(idProducto)
+      res.status(STATUS_CODE.OK).json(productID)
     
   } catch (error) {
     console.log(error.message)
