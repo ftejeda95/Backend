@@ -4,8 +4,8 @@ const knex = require('../../db/index')
 
 let products = knex.getProducts()
 
-
 router.get('/', function(req, res, next) {
+
   res.render('index', { products });
 });
 

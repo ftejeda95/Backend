@@ -6,9 +6,9 @@ const { engine } = require('express-handlebars')
 const productos = require('./routers/productos')
 const upload = require('./routers/upload')
 const indexRouter = require('./routers/views/index');
-const productsRouter = require('./routers/views/producto')
 const { initSocket } = require('./socket')
 const knex = require('./db/index')
+const productsTest = require('./routers/views-test/index')
 //Crear App
 const app = express()
 
@@ -32,9 +32,8 @@ app.use(useragent.express())
 //configuro los Router
 
 app.use('/', indexRouter);
-app.use('/productos', productsRouter);
 app.use('/api', productos, upload)
-
+app.use('/productos-test', productsTest);
 
 //configuro Error
 

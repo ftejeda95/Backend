@@ -3,6 +3,7 @@ const express = require('express')
 const { Router } = express
 const knex = require('../db/index')
 const router = Router(Router)
+const {faker} = require('@faker-js/faker/locale/es');
 
 const STATUS_CODE = {
   OK: 200,
@@ -10,6 +11,7 @@ const STATUS_CODE = {
   NO_CONTENT: 204,
   NOT_FOUND: 404,
 }
+
 let productos = [
   {
     id: 1,

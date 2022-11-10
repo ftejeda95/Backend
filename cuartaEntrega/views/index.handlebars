@@ -28,10 +28,30 @@
 </div>
 <div>
  <h1>CHAT</h1>
+ <div id="title">
 <form id="form-message">
     <input type="email" name="email" id="input-email" placeholder="Ingresa tu correo electronico" required="">
+    <input type="nombre" name="nombre" id="input-nombre" placeholder="Ingresa tu nombre" required="">
+    <input type="apellido" name="apellido" id="input-apellido" placeholder="Ingresa tu apellido" required="">
+    <input type="edad" name="edad" id="input-edad" placeholder="Ingresa tu edad" required="">
+    <input type="alias" name="alias" id="input-alias" placeholder="Ingresa tu alias" required="">
+    <input type="avatar" name="avatar" id="input-avatar" placeholder="Ingresa un URL de avatar" required="">
     <ul id="list-messages"></ul>
     <input type="text" name="message" id="input-message" placeholder="Ingresa mensaje..." required="">
     <button type="submit">Enviar</button>
+
+    {{!-- { 
+    author: {
+        id: 'mail del usuario', 
+        nombre: 'nombre del usuario', 
+        apellido: 'apellido del usuario', 
+        edad: 'edad del usuario', 
+        alias: 'alias del usuario',
+        avatar: 'url avatar (foto, logo) del usuario'
+    },
+    text: 'mensaje del usuario'
+} --}}
+
 </form>
+</div>
 </div>

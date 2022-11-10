@@ -1,5 +1,7 @@
-const knex = require('knex')
 
+const {faker} = require('@faker-js/faker/locale/es');
+const fs = require('fs')
+const knex = require('knex')
 
 const optionsMariaDB= {
     client: 'mysql',
@@ -85,8 +87,13 @@ const knexInstance = knex(optionsMariaDB)
       }
       await knexInstance.schema.createTable('messagge', (table) => {
         table.string('email', 50).notNullable()
-        table.string('date').notNullable()
         table.string('message',250).notNullable()
+        table.string('nombre',250).notNullable()
+        table.string('apellido',250).notNullable()
+        table.string('edad',250).notNullable()
+        table.string('alias',250).notNullable()
+        table.string('avatar',250).notNullable()
+        table.string('date').notNullable()
       })
       console.log('Tabla messagge creada.')
     } catch (error) {
@@ -122,13 +129,63 @@ const knexInstance = knex(optionsMariaDB)
       knexInstance.destroy()
     }
   }
+const {commerce,image} = faker
 
-  module.exports = {
-    createTable,
-    getProducts,
-    insertProducts,
-    getProductsId,
-    createTableMessagge,
-    insertMessagge,
-    getMessagge
+function getProdutsTest(count=5) {
+  const productos = []
+  for (let index = 0; index < parseInt(count); index++) {
+    productos.push({
+      id: index + 1,
+      title: commerce.product(),
+      price: commerce.price(),
+      thumbnail: image.imageUrl(50, 50, 'food' ,true),
+    })
   }
+  return productos
+}
+
+
+// async function listarAll() {
+//   try {
+//       const objs = await fs.readFile('./message.json', 'utf-8')
+//       return JSON.parse(objs)
+//   } catch (error) {
+//       return []
+//   }
+// }
+// async function listar(id) {
+//   const objs = await listarAll()
+//   const buscado = objs.find(o => o.id == id)
+//   return buscado
+// }
+// async function guardar(obj) {
+//   const objs = await listarAll()
+//   console.log(obj)
+//   let newId
+//   if (objs.length == 0) {
+//       newId = 1
+//   } else {
+//       newId = objs[objs.length - 1].id + 1
+//   }
+
+//   const newObj = { ...obj, id: newId }
+//   objs.push(newObj)
+//   try {
+//       await fs.writeFile('./message.json', JSON.stringify(objs, null, 2))
+
+//   } catch (error) {
+//     console.log(`Error al guardar:`,error)
+
+//   }
+// }
+
+module.exports = {
+  createTable,
+  getProducts,
+  insertProducts,
+  createTableMessagge,
+  insertMessagge,
+  getMessagge,
+  getProdutsTest,
+
+}
