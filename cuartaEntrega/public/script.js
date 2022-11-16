@@ -31,7 +31,8 @@ socket.on("add", (newProducts) => {
 });
 
 //SOCKET CHAT
-const tilte = document.getElementById("title")
+
+const tilte = document.getElementById("title");
 const formMessage = document.getElementById("form-message");
 const inputNombre = document.getElementById("input-nombre");
 const inputApellido = document.getElementById("input-apellido");
@@ -44,62 +45,86 @@ const listMessages = document.getElementById("list-messages");
 
 let messages = [];
 
+const dataMensaje = () => {
+  const data1 = {
+    author: {
+      email: inputEmail.value,
+      nombre: inputNombre.value,
+      apellido: inputApellido.value,
+      edad: inputEdad.value,
+      alias: inputAlias.value,
+      avatar: inputAvatar.value,
+    },
+    text: inputMessage.value,
+    date: new Date().toLocaleString(),
+  };
+  return data1;
+};
+
 function htmlList(mensajes) {
   mensajes.forEach((mensaje) => {
     const li = document.createElement("li");
-    li.innerHTML = `<li style="color:green;"><strong style="color:blue;">${mensaje.email}</strong>--<span style="color:red;">${mensaje.date}</span>: ${mensaje.message}</li>`;
+    li.innerHTML = `<li style="color:green;"><img src="${mensaje.author.avatar}" width="50"><strong style="color:blue;">${mensaje.author.email}</strong>--<span style="color:red;">${mensaje.date}</span>: ${mensaje.text}</li>`;
     listMessages.appendChild(li);
   });
 }
 formMessage.addEventListener("submit", (event) => {
   event.preventDefault();
-  const dataChat = {
-    email: inputEmail.value,
-    message: inputMessage.value,
-    nombre: inputNombre.value,
-    apellido: inputApellido.value,
-    edad: inputEdad.value,
-    alias: inputAlias.value,
-    avatar: inputAvatar.value,
-  };
+  let dataChat = dataMensaje();
   socket.emit("new-message", dataChat);
   inputMessage.value = "";
   inputMessage.focus();
 });
 
-socket.on("notification", (data) => {
-  const authorScheme = new normalizr.schema.Entity(
+socket.on('connection', () => {
+  console.log('Conectados al servidor');
+});
+
+socket.on("history-message", (data) => {
+  /* se desnormaliza la informacion */
+  const autorScheme = new normalizr.schema.Entity(
     "author",
     {},
     { idAttribute: "email" }
   );
 
-  const messageScheme = new normalizr.schema.Entity("mensaje", {
-    author: authorScheme,
+  const mensajeScheme = new normalizr.schema.Entity("mensaje", {
+    author: autorScheme,
   });
-  const postScheme = new normalizr.schema.Entity("mensaje", {
-    mensaje: [messageScheme],
+  const mensajeTotla = new normalizr.schema.Entity("mensaje", {
+    mensaje: [mensajeScheme],
   });
   const dataReversed = normalizr.denormalize(
     data.result,
-    postScheme,
+    mensajeTotla,
     data.entities
   );
-
+  console.log("esto es Data", dataReversed);
+  // cuanto pesa la orginial
   const originalSize = JSON.stringify(dataReversed).length;
   const normalizedSize = JSON.stringify(data).length;
   const resultSata = (normalizedSize * 100) / originalSize;
   let totalTotal = resultSata.toFixed(2);
-  console.log(data, normalizedSize);
+
+  console.log("Data normalizada", data, normalizedSize);
 
   console.log(
     "--------------------------------------------------------------------"
   );
-  console.log(dataReversed, originalSize);
-  tilte.innerText = "";
+
+  console.log("Data Desnormalizada", dataReversed, originalSize);
+
   console.log(`Porcentaje de compresion: ${totalTotal}%`);
   tilte.innerText = `Porcentaje de compresion: ${totalTotal}%`;
+  listMessages.innerText = '';
+  htmlList(dataReversed.mensaje);
+});
+
+socket.on("notification", (data) => {
+
   const li = document.createElement("li");
-  li.innerHTML = `<li style="color:green;"><strong style="color:blue;">${dataReversed.author.email}</strong>--<span style="color:red;">${dataReversed.date}</span> <img img src="${dataReversed.author.avatar}" alt="${dataReversed.author.nombre}" width="50px">: ${dataReversed.text}</li>`;
+  let mensaje = data
+  li.innerHTML = `<li style="color:green;"><img src="${mensaje.author.avatar}" width="50"><strong style="color:blue;">${mensaje.author.email}</strong>--<span style="color:red;">${mensaje.date}</span>: ${mensaje.text}</li>`
   listMessages.appendChild(li);
+
 });

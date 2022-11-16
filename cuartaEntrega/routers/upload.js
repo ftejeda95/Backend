@@ -1,30 +1,30 @@
-const express = require('express')
+import express from "express";
 
-const multer  = require('multer')
-const { Router } = express
+import multer from "multer";
 
-const router = Router()
+const { Router } = express;
+
+const router = Router();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads')
+    cb(null, "uploads");
   },
   filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`)
-  }
-})
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
 
-const upload = multer({ storage })
+const upload = multer({ storage });
 
-router.post('/productos', upload.single('thumbnail'), (req, res, next) => {
-  const { file } = req
+router.post("/productos", upload.single("thumbnail"), (req, res, next) => {
+  const { file } = req;
   if (!file) {
-    const error = new Error('Archivo no encontrado.')
-    error.httpStatusCode = 400
-    return next()
+    const error = new Error("Archivo no encontrado.");
+    error.httpStatusCode = 400;
+    return next();
   }
-  res.send(file)
-})
+  res.send(file);
+});
 
-
-module.exports = router
+export default router;

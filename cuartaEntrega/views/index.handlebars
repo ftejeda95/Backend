@@ -1,3 +1,20 @@
+        <div class=' d-flex justify-content-evenly mt-5 mb-5 bg-light align-items-center'
+                  >
+        <h1>Bienvenido {{user}}</h1>
+        <div >
+        <a href="/logout">Logout</a>
+        </div>
+        </div>
+
+<form action="/productos" method="post" id="form-products">
+      <label for="title" class="form-label">Nombre del Producto</label>
+      <input type="text" name="title" id="input-title" class="form-control" placeholder="title" >
+      <label for="price" class="form-label">Precio</label>
+      <input type="number" name="price" id="input-price"  class="form-control" placeholder="price" >
+      <label for="thumbnail" class="form-label">Direccion https</label>
+      <input type="text" name="thumbnail" id="input-thumbnail" class="form-control" placeholder="thumbnail" ><br>
+      <button type="submit" class="btn btn-primary">Enviar</button>
+</form>
 
 <h1>INCORPORAR PRODUCTOS</h1>
 
@@ -28,7 +45,8 @@
 </div>
 <div>
  <h1>CHAT</h1>
- <div id="title">
+ <h2 id="title"></h2>
+ <div>
 <form id="form-message">
     <input type="email" name="email" id="input-email" placeholder="Ingresa tu correo electronico" required="">
     <input type="nombre" name="nombre" id="input-nombre" placeholder="Ingresa tu nombre" required="">
@@ -40,18 +58,7 @@
     <input type="text" name="message" id="input-message" placeholder="Ingresa mensaje..." required="">
     <button type="submit">Enviar</button>
 
-    {{!-- { 
-    author: {
-        id: 'mail del usuario', 
-        nombre: 'nombre del usuario', 
-        apellido: 'apellido del usuario', 
-        edad: 'edad del usuario', 
-        alias: 'alias del usuario',
-        avatar: 'url avatar (foto, logo) del usuario'
-    },
-    text: 'mensaje del usuario'
-} --}}
-
+  
 </form>
 </div>
 </div>

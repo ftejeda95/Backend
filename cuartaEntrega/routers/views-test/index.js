@@ -1,15 +1,16 @@
-const { query } = require('express');
-const express = require('express');
+import { query } from "express";
+import express from "express";
 const router = express.Router();
-const knex = require('../../db/index')
+import {getProdutsTest} from "../../db/index.js";
 
+router.get("/product-test/", async function (req, res, next) {
+  let products = await getProdutsTest();
+  console.log(products);
+  res.render("tabla", {
+    products,
+    isEmpty: !products.length,
+    tieneImg: !products.thumbnail,
+  });
+});
 
-router.get('/', async function(req, res, next) {
-    let products = knex.getProdutsTest()
-    console.log(products)
-    res.render('tabla', { products, isEmpty: !products.length,tieneImg: !products.thumbnail })    
-      
-     });
-
-
-module.exports = router;
+export default router;

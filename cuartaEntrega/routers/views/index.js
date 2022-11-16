@@ -1,24 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const knex = require('../../db/index')
+import { Router } from 'express';
+import productsTest from '../views-test/index.js';
+import login from './login.js';
 
-let products = knex.getProducts()
+const router = Router();
+router.use('/', productsTest, login);
 
-router.get('/', function(req, res, next) {
-
-  res.render('index', { products });
-});
-
-router.post('/productos', async function(req, res, next) {
-  let {body : data} = req
-
-  if(data.title == ''|| data.price == ''||data.thumbnail == ''){
-     res.render('tabla',  { products, isEmpty: !products.length })
-  }else{
-    await knex.insertProducts(data)
-     res.render('tabla', { products, isEmpty: !products.length,tieneImg: !products.thumbnail })
-  }
-});
-
-
-module.exports = router;
+export default router;
