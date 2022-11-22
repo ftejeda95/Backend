@@ -12,10 +12,13 @@ import cors from 'cors'
 import { fileURLToPath } from 'url';
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
-
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import bcrypt from 'bcrypt';
+import UserModel from './model/user.js';
 //Crear App
 const app = express();
-
+const salt = bcrypt.genSaltSync(10);
 //Crear Puerto
 const PORT = process.env.NODE_PORT;
 const ENV = process.env.NODE_ENV;
@@ -29,7 +32,113 @@ const __dirname = path.dirname(__filename);
 app.use('/', express.static(path.join(__dirname, 'public/')));
 app.use(cors())
 //configuro Motor de Plantillas
+passport.use(
+  'sign-in',
+  new LocalStrategy(
+        {
+              usernameField: 'email',
+        },
+        (email, password, done) => {
+              UserModel.findOne({ email })
+                    .then((user) => {
+                          if (!user) {
+                                console.log(
+                                      `User with ${email} not found.`
+                                );
 
+                                return done(null, false);
+                          }
+
+                          if (
+                                !bcrypt.compareSync(password, user.password)
+                          ) {
+                                console.log('Invalid Password');
+
+                                return done(null, false);
+                          }
+                          done(null, user);
+                    })
+                    .catch((error) => {
+                          console.log('Error in sign-in', error.message);
+
+                          done(error, false);
+                    });
+        }
+  )
+);
+
+passport.use(
+  'sign-up',
+  new LocalStrategy(
+        {
+              usernameField: 'email',
+              passReqToCallback: true,
+        },
+        (req, email, password, done) => {
+              UserModel.findOne({ email })
+                    .then((user) => {
+                          if (user) {
+                                console.log(
+                                      `User ${email} already exists.`
+                                );
+
+                                return done(null, false);
+                          } else {
+                                const salt = bcrypt.genSaltSync(10);
+                                const hash = bcrypt.hashSync(
+                                      req.body.password,
+                                      salt
+                                );
+                                req.body.password = hash;
+
+                                return UserModel.create(req.body);
+                          }
+                    })
+                    .then((newUser) => {
+                          console.log(newUser);
+                          if (newUser) {
+                                console.log(
+                                      `User ${newUser.email} registration succesful.`
+                                );
+
+                                done(null, newUser);
+                          } else {
+                                throw new Error('User already exists');
+                          }
+                    })
+                    .catch((error) => {
+                          console.log('Error in sign-up', error.message);
+                          return done(error);
+                    });
+        }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser((_id, done) => {
+  UserModel.findOne({ _id })
+        .then((user) => done(null, user))
+        .catch(done);
+});
+
+app.use(
+  session({
+        secret: 'K&UV1tlls3T0',
+        cookie: {
+              httpOnly: false,
+              secure: false,
+              maxAge: 600000,
+        },
+        rolling: true,
+        resave: false,
+        saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");

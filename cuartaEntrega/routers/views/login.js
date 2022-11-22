@@ -1,38 +1,41 @@
 import { Router } from 'express';
+import passport from 'passport';
+
 const router = Router();
 
 router.get('/', (req, res) => {
-    if (!req.session.username) {
-          res.render('login');
-    } else {
-          const { username } = req.session;
-          let data = { user: username };
-          res.render('index', data);
-    }
+      if (!req.isAuthenticated()) {
+            res.render('login');
+      } else {
+            const { user } = req;
+            let data = { user: user.email };
+            res.render('index', data);
+      }
 });
-
-router.post('/login', (req, res) => {
-    const { username } = req.body;
-    req.session.username = username;
-    res.redirect('/');
+router.post(
+      '/sign-in',
+      passport.authenticate('sign-in', {
+            successRedirect: '/',
+            failureRedirect: '/faillogin',
+      }),
+      (req, res) => {
+            res.redirect('/');
+      }
+);
+router.get('/faillogin', (req, res) => {
+      res.render('faillogin');
 });
 
 router.get('/logout', (req, res) => {
-    const { username } = req.session;
-    req.session.destroy((error) => {
-          if (!error) {
-                let data = { user: username };
-                res.render('logout', data);
-          } else {
-                res.send('Ocurrio un error', error.message);
-          }
-    });
+      const { username } = req.body;
+      req.logout((error) => {
+            if (!error) {
+                  let data = { user: username };
+                  res.render('logout', data);
+            } else {
+                  res.send('Ocurrio un  error', error.message);
+            }
+      });
 });
 
-export default router
-
-
-
-
-
-
+export default router;

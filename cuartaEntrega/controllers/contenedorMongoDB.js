@@ -10,7 +10,7 @@ class ContenedorMongoDB {
 
   async connect() {
     try {
-          const URI = process.env.mongoDB;
+          const URI = process.env.MONGO_URL;
           await mongoose.connect(URI);
           console.log('Conectado a la Base de datos MongoDb');
     } catch (error) {
