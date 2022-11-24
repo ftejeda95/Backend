@@ -1,21 +1,23 @@
 import express from "express";
-import http from "http";
+import http, { request } from "http";
 import useragent from "express-useragent";
 import path from "path";
 import { engine } from "express-handlebars";
 import productos from "./routers/productos.js";
 import upload from "./routers/upload.js";
 import indexRouter from "./routers/views/index.js";
-import {initSocket} from "./socket.js";
+import { initSocket } from "./socket.js";
 import productsTest from "./routers/views-test/index.js";
-import cors from 'cors'
-import { fileURLToPath } from 'url';
-import session from 'express-session'
-import MongoStore from 'connect-mongo'
-import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
-import bcrypt from 'bcrypt';
-import UserModel from './model/user.js';
+import cors from "cors";
+import { fileURLToPath } from "url";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcrypt from "bcrypt";
+import info from "./routers/usarFork/info.js";
+import UserModel from "./model/user.js";
+import { fork } from "child_process";
 //Crear App
 const app = express();
 const salt = bcrypt.genSaltSync(10);
@@ -29,88 +31,77 @@ app.use(express.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use('/', express.static(path.join(__dirname, 'public/')));
-app.use(cors())
+app.use("/", express.static(path.join(__dirname, "public/")));
+app.use(cors());
 //configuro Motor de Plantillas
 passport.use(
-  'sign-in',
+  "sign-in",
   new LocalStrategy(
-        {
-              usernameField: 'email',
-        },
-        (email, password, done) => {
-              UserModel.findOne({ email })
-                    .then((user) => {
-                          if (!user) {
-                                console.log(
-                                      `User with ${email} not found.`
-                                );
+    {
+      usernameField: "email",
+    },
+    (email, password, done) => {
+      UserModel.findOne({ email })
+        .then((user) => {
+          if (!user) {
+            console.log(`User with ${email} not found.`);
 
-                                return done(null, false);
-                          }
+            return done(null, false);
+          }
 
-                          if (
-                                !bcrypt.compareSync(password, user.password)
-                          ) {
-                                console.log('Invalid Password');
+          if (!bcrypt.compareSync(password, user.password)) {
+            console.log("Invalid Password");
 
-                                return done(null, false);
-                          }
-                          done(null, user);
-                    })
-                    .catch((error) => {
-                          console.log('Error in sign-in', error.message);
+            return done(null, false);
+          }
+          done(null, user);
+        })
+        .catch((error) => {
+          console.log("Error in sign-in", error.message);
 
-                          done(error, false);
-                    });
-        }
+          done(error, false);
+        });
+    }
   )
 );
 
 passport.use(
-  'sign-up',
+  "sign-up",
   new LocalStrategy(
-        {
-              usernameField: 'email',
-              passReqToCallback: true,
-        },
-        (req, email, password, done) => {
-              UserModel.findOne({ email })
-                    .then((user) => {
-                          if (user) {
-                                console.log(
-                                      `User ${email} already exists.`
-                                );
+    {
+      usernameField: "email",
+      passReqToCallback: true,
+    },
+    (req, email, password, done) => {
+      UserModel.findOne({ email })
+        .then((user) => {
+          if (user) {
+            console.log(`User ${email} already exists.`);
 
-                                return done(null, false);
-                          } else {
-                                const salt = bcrypt.genSaltSync(10);
-                                const hash = bcrypt.hashSync(
-                                      req.body.password,
-                                      salt
-                                );
-                                req.body.password = hash;
+            return done(null, false);
+          } else {
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(req.body.password, salt);
+            req.body.password = hash;
 
-                                return UserModel.create(req.body);
-                          }
-                    })
-                    .then((newUser) => {
-                          console.log(newUser);
-                          if (newUser) {
-                                console.log(
-                                      `User ${newUser.email} registration succesful.`
-                                );
+            return UserModel.create(req.body);
+          }
+        })
+        .then((newUser) => {
+          console.log(newUser);
+          if (newUser) {
+            console.log(`User ${newUser.email} registration succesful.`);
 
-                                done(null, newUser);
-                          } else {
-                                throw new Error('User already exists');
-                          }
-                    })
-                    .catch((error) => {
-                          console.log('Error in sign-up', error.message);
-                          return done(error);
-                    });
-        }
+            done(null, newUser);
+          } else {
+            throw new Error("User already exists");
+          }
+        })
+        .catch((error) => {
+          console.log("Error in sign-up", error.message);
+          return done(error);
+        });
+    }
   )
 );
 
@@ -120,21 +111,21 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((_id, done) => {
   UserModel.findOne({ _id })
-        .then((user) => done(null, user))
-        .catch(done);
+    .then((user) => done(null, user))
+    .catch(done);
 });
 
 app.use(
   session({
-        secret: 'K&UV1tlls3T0',
-        cookie: {
-              httpOnly: false,
-              secure: false,
-              maxAge: 600000,
-        },
-        rolling: true,
-        resave: false,
-        saveUninitialized: false,
+    secret: "K&UV1tlls3T0",
+    cookie: {
+      httpOnly: false,
+      secure: false,
+      maxAge: 600000,
+    },
+    rolling: true,
+    resave: false,
+    saveUninitialized: false,
   })
 );
 app.use(passport.initialize());
@@ -144,23 +135,23 @@ app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.use(useragent.express());
 
-app.set("views", path.join(__dirname, 'views/'));
+app.set("views", path.join(__dirname, "views/"));
 
 app.use(
   session({
     store: new MongoStore({
-          mongoUrl: process.env.MONGO_URL,
-          ttl: 600,
+      mongoUrl: process.env.MONGO_URL,
+      ttl: 600,
     }),
-    secret: 'b$x0J77c#20k',
+    secret: "b$x0J77c#20k",
     resave: true,
     saveUninitialized: true,
-}))
+  })
+);
 //configuro los Router
 
-app.use("/", indexRouter,productsTest);
+app.use("/", indexRouter, productsTest, info);
 app.use("/api", productos, upload);
-
 
 //configuro Error
 
@@ -172,8 +163,19 @@ app.use(function (err, req, res, next) {
 //crear Servidor
 
 const server = http.createServer(app);
-initSocket(server,PORT);
+initSocket(server, PORT);
 
+server.on("request", (req, res) => {
+  let { url } = req;
+  let cant = 2000000
+  if (url == `/api/randoms/`) {
+    const computo = fork("./routers/usarFork/calculo.js");
+    computo.send(parseInt(cant));
+    computo.on("message", (repetido) => {
+      res.end(JSON.stringify(repetido));
+    });
+  } 
+});
 //Escucho Servidor
 
 server.listen(PORT, () => {
