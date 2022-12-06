@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
-
-
+import dotenv from "dotenv";
+dotenv.config()
 class ContenedorMongoDB {
   constructor(modelName, schema) {
       this.collection = mongoose.model(modelName, schema)
@@ -11,6 +11,7 @@ class ContenedorMongoDB {
   async connect() {
     try {
           const URI = process.env.MONGO_URL;
+
           await mongoose.connect(URI);
           console.log('Conectado a la Base de datos MongoDb');
     } catch (error) {

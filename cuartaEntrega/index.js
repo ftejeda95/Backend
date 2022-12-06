@@ -18,13 +18,38 @@ import bcrypt from "bcrypt";
 import info from "./routers/usarFork/info.js";
 import UserModel from "./model/user.js";
 import { fork } from "child_process";
+import minimist from 'minimist'
+import cluster from 'cluster'
+import os from 'os'
 //Crear App
+// 
+if (mode === 'cluster' && cluster.isMaster) { // Require node in version 16 or higher. Other versions call isMaster property.
+  for (let i = 0; i < os.cpus().length; i++) {
+    cluster.fork()
+  }
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} | code ${code} | signal ${signal}`)
+    console.log('Starting a new worker...')
+    cluster.fork()
+  })
+} else {
 const app = express();
 const salt = bcrypt.genSaltSync(10);
 //Crear Puerto
-const PORT = process.env.NODE_PORT;
+// const PORT = process.env.NODE_PORT;
 const ENV = process.env.NODE_ENV;
 //configuro la App
+
+const opts = {
+  default: {
+    port: 8080,
+  },
+  alias: {
+    p: 'port',
+  }
+}
+
+const { port: PORT } = minimist(process.argv.slice(2), opts)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -150,9 +175,13 @@ app.use(
 );
 //configuro los Router
 
+
 app.use("/", indexRouter, productsTest, info);
 app.use("/api", productos, upload);
-
+app.get('/api/ramdoms', (req, res) => {
+  console.log(`Here from process ${process.pid} litening in port ${PORT}.`);
+  res.send(`<h1>Servidor express en ${PORT} - PID ${process.pid} - ${(new Date()).toLocaleString()}</h1>`)
+})
 //configuro Error
 
 app.use(function (err, req, res, next) {
@@ -179,10 +208,9 @@ server.on("request", (req, res) => {
 //Escucho Servidor
 
 server.listen(PORT, () => {
-  console.log(
-    `Servidor http esta escuchando en el puerto ${server.address().port}`
-  );
+  console.log(`Server running in http://localhost:${PORT}/ from process ${process.pid}`)
   console.log(`http://localhost:${server.address().port}`);
   console.log(`Environment:${ENV}`);
 });
 server.on("error", (error) => console.log(`Error en servidor ${error}`));
+}
