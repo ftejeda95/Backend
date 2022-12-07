@@ -43,9 +43,11 @@ const ENV = process.env.NODE_ENV;
 const opts = {
   default: {
     port: 8080,
+    modo: 'fork',
   },
   alias: {
     p: 'port',
+    m: 'modo'
   }
 }
 
@@ -56,7 +58,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use("/", express.static(path.join(__dirname, "public/")));
+// app.use("/", express.static(path.join(__dirname, "public/")));
 app.use(cors());
 //configuro Motor de Plantillas
 passport.use(
@@ -208,7 +210,7 @@ server.on("request", (req, res) => {
 //Escucho Servidor
 
 server.listen(PORT, () => {
-  console.log(`Server running in http://localhost:${PORT}/ from process ${process.pid}`)
+  console.log(`Server running in http://localhost:${PORT}/ from process ${process.pid}, MODO: ${argv.modo}`)
   console.log(`http://localhost:${server.address().port}`);
   console.log(`Environment:${ENV}`);
 });
