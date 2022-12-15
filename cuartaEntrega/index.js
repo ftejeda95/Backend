@@ -19,9 +19,21 @@ import info from "./routers/usarFork/info.js";
 import UserModel from "./model/user.js";
 import { fork } from "child_process";
 import minimist from 'minimist'
-import cluster from 'cluster'
 import os from 'os'
+
 //Crear App
+const opts = {
+  default: {
+    port: 8080,
+    mode: 'fork',
+  },
+  alias: {
+    p: 'port',
+    m: 'mode'
+  }
+}
+
+const { port: PORT, mode } = minimist(process.argv.slice(2), opts)
 // 
 if (mode === 'cluster' && cluster.isMaster) { // Require node in version 16 or higher. Other versions call isMaster property.
   for (let i = 0; i < os.cpus().length; i++) {
@@ -40,18 +52,7 @@ const salt = bcrypt.genSaltSync(10);
 const ENV = process.env.NODE_ENV;
 //configuro la App
 
-const opts = {
-  default: {
-    port: 8080,
-    modo: 'fork',
-  },
-  alias: {
-    p: 'port',
-    m: 'modo'
-  }
-}
 
-const { port: PORT } = minimist(process.argv.slice(2), opts)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -210,7 +211,7 @@ server.on("request", (req, res) => {
 //Escucho Servidor
 
 server.listen(PORT, () => {
-  console.log(`Server running in http://localhost:${PORT}/ from process ${process.pid}, MODO: ${argv.modo}`)
+  console.log(`Server running in http://localhost:${PORT}/ from process ${process.pid}`)
   console.log(`http://localhost:${server.address().port}`);
   console.log(`Environment:${ENV}`);
 });

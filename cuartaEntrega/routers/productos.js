@@ -59,6 +59,7 @@ router.post("/productos", (req, res) => {
   data = { id: siguienteID, ...data };
   productos.push(data);
   siguienteID++;
+  logger.info(`Ruta ${req.originalUrl} metodo GET`)
   res.status(STATUS_CODE.OK).json(data);
 });
 
@@ -74,9 +75,10 @@ router.put("/productos/:id", async (req, res) => {
   const data = req.body;
   try {
     await actualizarProd(idProducto, data);
+    logger.info(`Ruta ${req.originalUrl} metodo GET`)
     res.status(STATUS_CODE.NO_CONTENT).end();
   } catch (error) {
-    console.log(error.message);
+    logger.error(error.message);
     res.json({ error: "producto no encontrado" }).end();
   }
 });
@@ -90,9 +92,10 @@ router.delete("/productos/:id", async (req, res) => {
   const idProducto = req.params.id;
   try {
     await deleteProd(idProducto);
+    logger.info(`Ruta ${req.originalUrl} metodo GET`)
     res.status(STATUS_CODE.NO_CONTENT).end();
   } catch (error) {
-    console.log(error.message);
+    logger.error(error.message);
     res.json({ error: "producto no encontrado" }).end();
   }
 });
@@ -104,6 +107,7 @@ router.get("/", function (req, res, next) {
 router.post("/productos", async function (req, res, next) {
   await productos.push(req.body);
   await console.log(productos[0].title);
+  logger.info(`Ruta ${req.originalUrl} metodo GET`)
   await res.render("tabla", { productos, isEmpty: !productos.length });
 });
 

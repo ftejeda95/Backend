@@ -1,5 +1,6 @@
 import { Router } from 'express';
-
+import compression from "compression";
+import logger from '../../logger.js'
 
 const STATUS_CODE = {
       OK: 200,
@@ -9,16 +10,23 @@ const STATUS_CODE = {
     };
 const router = Router();
 
-router.get('/info', (req, res) => {
-      const argv =process.argv[1]
-      const plataforma =process.platform
-      const version =process.version
-      const memory=process.memoryUsage()
-      const exec= process.execPath
-      const pid = process.pid
-      const cwd=process.cwd()
-      res.status(STATUS_CODE.OK).json({argumentosEntrada :argv,NombrePlataforma:plataforma,versionNode:version,memoriaReservada:memory,pathEjecucion:cwd,ProcessId:pid,CarpetaProyecto:exec});
-      }
+router.get('/info',  compression(), (req, res) => {
+      try {
+            const data = {
+                  cpus: os.cpus().length,
+                  arg: process.argv.slice(2),
+                  so: process.platform,
+                  vn: process.version,
+                  rss: process.memoryUsage().rss,
+                  pe: process.execPath,
+                  pid: process.pid,
+                  carp: process.cwd(),
+            };
+            logger.info(`Ruta ${req.originalUrl} metodo GET`);
+            res.render('./info', data);
+      } catch (error) {
+            next(error);
+      }}
 );
 
 export default router;

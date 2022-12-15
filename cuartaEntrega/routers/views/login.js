@@ -19,10 +19,13 @@ router.post(
             failureRedirect: '/faillogin',
       }),
       (req, res) => {
+            logger.info(`Ruta ${req.originalUrl} metodo GET`)
             res.redirect('/');
+            
       }
 );
 router.get('/faillogin', (req, res) => {
+      logger.info(`Ruta ${req.originalUrl} metodo GET`)
       res.render('faillogin');
 });
 
@@ -31,8 +34,10 @@ router.get('/logout', (req, res) => {
       req.logout((error) => {
             if (!error) {
                   let data = { user: username };
+                  logger.info(`Ruta ${req.originalUrl} metodo GET`)
                   res.render('logout', data);
             } else {
+                  logger.error(error.message);
                   res.send('Ocurrio un  error', error.message);
             }
       });
