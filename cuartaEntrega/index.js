@@ -146,12 +146,6 @@ passport.deserializeUser((_id, done) => {
 app.use(
   session({
     secret: "K&UV1tlls3T0",
-    cookie: {
-      httpOnly: false,
-      secure: false,
-      maxAge: 600000,
-    },
-    rolling: true,
     resave: false,
     saveUninitialized: false,
   })
